@@ -4,11 +4,11 @@ country = "es"
 timezone = "Europe/Madrid"
 root_password = "<TU_PASSWORD_SECRETA>"
 mailto = "admin@tudominio.com"
-fqdn = "pve-01.<TU_DOMINIO>" # Ej: pve-01.tfg.local
+fqdn = "pve-0X.<TU_DOMINIO>" # Sustituir la X por 2 o 3 (Ej: pve-02.tfg.local)
 
 [network]
 source = "from-answer"
-cidr = "<IP_NODO_1>/24"      # Ej: 192.168.1.51/24
+cidr = "<IP_NODO_X>/24"      # Sustituir por la IP del nodo (Ej: 192.168.1.52/24)
 gateway = "<IP_GATEWAY>"     # Ej: 192.168.1.1
 dns = "<IP_DNS>"             # Ej: 8.8.8.8
 filter.ID_NET_NAME_PATH = "<NOMBRE_INTERFAZ_RED>" # Ej: enp0s31f6
@@ -16,9 +16,3 @@ filter.ID_NET_NAME_PATH = "<NOMBRE_INTERFAZ_RED>" # Ej: enp0s31f6
 [disk-setup]
 filesystem = "ext4"
 disk_list = ["<DISCO_SISTEMA>"] # Ej: nvme0n1 o sda
-
-# INSTRUCCIÓN NATIVA PARA EL ORQUESTADOR
-# Asegura que la red esté levantada antes de ejecutar el servicio systemd
-[first-boot]
-source = "from-iso"
-ordering = "network-online"
