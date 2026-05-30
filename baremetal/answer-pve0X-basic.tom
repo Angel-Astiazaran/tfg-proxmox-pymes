@@ -1,0 +1,20 @@
+[global]
+keyboard = "es"
+country = "es"
+timezone = "Europe/Madrid"
+root_password = "<PASSWORD_ROOT>"   # Ej: P@ssw0rd
+mailto = "admin@yourdomain.com"     # Ej: admin@yourdomain.com
+fqdn = "pve-01.<YOUR_DOMAIN>"       # Ej: pve-01.tfg.local 
+# Sustitute the X with 2 or 3 (Ej: pve-02.tfg.local)
+
+
+[network]
+source = "from-answer"
+cidr = "<IP_NODO_1>/24"             # Ej: 192.168.1.51/24
+gateway = "<IP_GATEWAY>"            # Ej: 192.168.1.1
+dns = "<IP_DNS>"                    # Ej: 8.8.8.8
+filter.ID_NET_NAME_PATH = "<NAME_OF_NETWORK_INTERFACE>"     # Ej: enp0s31f6
+
+[disk-setup]
+filesystem = "ext4"
+disk_list = ["<SYSTEM_DISK>"]       # Ej: nvme0n1 o sda
