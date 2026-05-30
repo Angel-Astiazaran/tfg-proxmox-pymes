@@ -1,0 +1,72 @@
+#cloud-config
+hostname: ubuntu-monitor-01
+manage_etc_hosts: true
+user: tfgadmin
+password: <VM_ADMIN_PASSWORD>
+chpasswd: { expire: False }
+ssh_pwauth: True
+
+packages:
+  - qemu-guest-agent
+  - nginx
+
+write_files:
+  - path: /etc/nginx/sites-available/default
+    content: |
+      server {
+          listen 80 default_server;
+          root /var/www/html;
+          index index.html;
+          location / {
+              try_files $uri $uri/ =404;
+          }
+          location /health {
+              proxy_pass http://<TARGET_VM_IP>/;
+              proxy_connect_timeout 1s;
+              proxy_send_timeout 1s;
+              proxy_read_timeout 1s;
+          }
+      }
+  - path: /var/www/html/index.html
+    content: |
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <meta charset="UTF-8">
+          <title>High Availability PoC - TFG</title>
+          <style>
+              body { font-family: Arial; text-align: center; padding-top: 20%; transition: background 0.2s; color: white; background: gray; }
+              h1 { font-size: 4em; }
+              #status { font-size: 2em; margin-top: 20px; }
+          </style>
+      </head>
+      <body>
+          <h1>HA Chronometer: <span id="chrono">0.0</span>s</h1>
+          <div id="status">Waiting for connection...</div>
+          <script>
+              let time = 0;
+              setInterval(() => {
+                  fetch('/health', { cache: 'no-store' })
+                  .then(response => {
+                      if(response.ok) {
+                          document.body.style.backgroundColor = '#28a745'; // Green
+                          document.getElementById('status').innerText = 'Target VM Online';
+                          time += 0.1;
+                          document.getElementById('chrono').innerText = time.toFixed(1);
+                      } else {
+                          throw new Error('Target offline');
+                      }
+                  })
+                  .catch(error => {
+                      document.body.style.backgroundColor = '#dc3545'; // Red
+                      document.getElementById('status').innerText = 'ERROR: TARGET OFFLINE. MIGRATING...';
+                  });
+              }, 100);
+          </script>
+      </body>
+      </html>
+
+runcmd:
+  - systemctl start qemu-guest-agent
+  - systemctl restart nginx
+  - systemctl enable nginx

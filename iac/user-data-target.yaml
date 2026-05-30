@@ -1,0 +1,16 @@
+#cloud-config
+hostname: ubuntu-target-01
+manage_etc_hosts: true
+user: tfgadmin
+password: <VM_ADMIN_PASSWORD>
+chpasswd: { expire: False }
+ssh_pwauth: True
+
+packages:
+  - qemu-guest-agent
+  - nginx
+
+runcmd:
+  - systemctl start qemu-guest-agent
+  - systemctl enable nginx
+  - systemctl start nginx
