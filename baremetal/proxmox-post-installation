@@ -1,0 +1,32 @@
+#!/bin/bash
+# This script runs inside the installation USB environment.
+# The newly installed physical hard drive is mounted at the "/target" path.
+# The current directory (.) is the PROXMOX-AUTO-CONF partition of the flash drive.
+echo "Injecting TFG orchestration configuration..."
+
+# 1. Copy the orchestration script directly from the flash drive to the hard drive
+cp ./tfg-orchestrator.sh /target/usr/local/bin/tfg-orchestrator.sh
+
+# Grant execution permissions
+chmod +x /target/usr/local/bin/tfg-orchestrator.sh
+
+# 2. Create the Systemd service to start with the server
+cat << 'EOF' > /target/etc/systemd/system/tfg-orchestrator.service
+[Unit]
+Description=TFG Proxmox Auto-Orchestrator
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/tfg-orchestrator.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# 3. Enable the service on the installed drive using chroot
+chroot /target systemctl enable tfg-orchestrator.service
+
+echo "Injection completed. Rebooting system..."
